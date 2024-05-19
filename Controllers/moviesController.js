@@ -3,44 +3,44 @@ const CustomError = require('../Utils/CustomError');
 const asyncErrorHandler = require('../Utils/asyncErrorHandler');
 const Movie = require('./../Models/movieModel');
 //ROUTE HANDLER FUNCTIONS
-exports.getAllMovies = async (req, res, next) => {
-  try {
-    const features = new Apifeatures(Movie.find(), req.query)
-      .filter()
-      .sort()
-      .limitFields()
-      .paginate();
+exports.getAllMovies = asyncErrorHandler(async (req, res, next) => {
+  //try {
+  const features = new Apifeatures(Movie.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
 
-    let movies = await features.query;
+  let movies = await features.query;
 
-    // const movies = await Movie.find(req.query);
+  // const movies = await Movie.find(req.query);
 
-    // const movies = await Movie.find()
-    //   .where('name')
-    //   .equals(req.query.name)
-    //   .where('ratings')
-    //   .equals(req.query.ratings);
+  // const movies = await Movie.find()
+  //   .where('name')
+  //   .equals(req.query.name)
+  //   .where('ratings')
+  //   .equals(req.query.ratings);
 
-    // const excludeFields = ['sort', 'page', 'limit', 'fields'];
-    // const queryObj = { ...req.query };
-    // excludeFields.forEach((el) => delete queryObj[el]);
-    // console.log(queryObj);
-    // const movies = await Movie.find(queryObj);
+  // const excludeFields = ['sort', 'page', 'limit', 'fields'];
+  // const queryObj = { ...req.query };
+  // excludeFields.forEach((el) => delete queryObj[el]);
+  // console.log(queryObj);
+  // const movies = await Movie.find(queryObj);
 
-    res.status(200).json({
-      status: 'success',
-      length: movies.length,
-      data: {
-        movies,
-      },
-    });
-  } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err.message,
-    });
-  }
-};
+  res.status(200).json({
+    status: 'success',
+    length: movies.length,
+    data: {
+      movies,
+    },
+  });
+  // } catch (err) {
+  //   res.status(404).json({
+  //     status: 'fail',
+  //     message: err.message,
+  //   });
+  // }
+});
 
 exports.getMovie = asyncErrorHandler(async (req, res, next) => {
   //try {
