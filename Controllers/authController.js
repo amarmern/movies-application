@@ -2,6 +2,7 @@ const User = require('../Models/userModel');
 const asyncErrorHandler = require('../Utils/asyncErrorHandler');
 const jwt = require('jsonwebtoken');
 const CustomError = require('../Utils/CustomError');
+const util = require('util');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.SECRET_STR, {
@@ -52,3 +53,42 @@ exports.login = async (req, res, next) => {
     token,
   });
 };
+
+exports.protect = asyncErrorHandler(async (req, res, next) => {
+  //1. Read the token & check if it exists
+  const testToken = req.headers.authorization;
+  let token;
+  if (testToken && testToken.startsWith('bearer')) {
+    token = testToken.split(' ')[1];
+  }
+  if (!token) {
+    next(new CustomError('You are not looged In!', 401));
+  }
+  console.log(token);
+  //2.validate the token
+  const decodedToken = await util.promisify(jwt.verify)(
+    token,
+    process.env.SECRET_STR
+  );
+  console.log(decodedToken);
+  //3.If the user is exists in db
+  const user = await User.findById(decodedToken.id);
+
+  if (!user) {
+    const error = new CustomError('The user with given does not exists', 401);
+    next(error);
+  }
+
+  //4. if the user changed password after the token was issued
+  const isPasswordChanged = await user.isPasswordChanged(decodedToken.iat);
+  if (isPasswordChanged) {
+    const error = new CustomError(
+      'The password has changed recently. please login again',
+      401
+    );
+    return next(error);
+  }
+  //5. Allow user to access the route
+  req.user = user;
+  next();
+});

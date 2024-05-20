@@ -17,20 +17,20 @@ const server = app.listen(port, () => {
   console.log(`server has started at port:  ${port}`);
 });
 
-process.on('unhandledRejection', (err) => {
-  console.log(err.name, err.message);
-  console.log('Unhandle error occurs shuting down...');
-  server.close(() => {
-    process.exit(1);
-  });
-});
+// process.on('unhandledRejection', (err) => {
+//   console.log(err.name, err.message);
+//   console.log('Unhandle error occurs shuting down...');
+//   server.close(() => {
+//     process.exit(1);
+//   });
+// });
 
-process.on('uncaughtException', (err) => {
-  console.log(err.name, err.message);
-  console.log('Uncought Exception occurs shuting down...');
-  server.close(() => {
-    process.exit(1);
-  });
-});
+// process.on('uncaughtException', (err) => {
+//   console.log(err.name, err.message);
+//   console.log('Uncought Exception occurs shuting down...');
+//   server.close(() => {
+//     process.exit(1);
+//   });
+// });
 
 //console.log(x);
