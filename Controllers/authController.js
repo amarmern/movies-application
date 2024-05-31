@@ -58,7 +58,7 @@ exports.protect = asyncErrorHandler(async (req, res, next) => {
   //1. Read the token & check if it exists
   const testToken = req.headers.authorization;
   let token;
-  if (testToken && testToken.startsWith('bearer')) {
+  if (testToken && testToken.startsWith('Bearer')) {
     token = testToken.split(' ')[1];
   }
   if (!token) {
@@ -92,3 +92,16 @@ exports.protect = asyncErrorHandler(async (req, res, next) => {
   req.user = user;
   next();
 });
+
+exports.restrict = (role) => {
+  return (req, res, next) => {
+    if (req.user.role !== role) {
+      const error = new CustomError(
+        'You do not have permission to perform the action',
+        403
+      );
+      next(error);
+    }
+    next();
+  };
+};
