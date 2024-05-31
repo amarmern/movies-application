@@ -93,9 +93,9 @@ exports.protect = asyncErrorHandler(async (req, res, next) => {
   next();
 });
 
-exports.restrict = (role) => {
+exports.restrict = (...role) => {
   return (req, res, next) => {
-    if (req.user.role !== role) {
+    if (role.includes(req.user.role)) {
       const error = new CustomError(
         'You do not have permission to perform the action',
         403
