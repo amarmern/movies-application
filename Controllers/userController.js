@@ -12,6 +12,16 @@ const signToken = (id) => {
   });
 };
 
+const filterReqObject = (obj, ...allowedFields) => {
+  const newObj = {};
+  Object.keys(obj).forEach((prop) => {
+    if (allowedFields.includes(prop)) {
+      newObj[prop] = obj[prop];
+    }
+  });
+  return newObj;
+};
+
 exports.updatePassword = asyncErrorHandler(async (req, res, next) => {
   //GET CURRENT USER DATAT FROM DATABASE
   const user = await User.findById(req.user._id).select('+password');
@@ -38,5 +48,24 @@ exports.updatePassword = asyncErrorHandler(async (req, res, next) => {
     data: {
       user,
     },
+  });
+});
+
+exports.updateMe = asyncErrorHandler(async (req, res, next) => {
+  //1.CHECK IF REQEST DATA CONTAINS PASSWORD || CONFIRM PASSWORD
+
+  if (req.body.password || req.body.confirmPassword) {
+    return next(
+      new CustomError(
+        'You cannot update your password using this endpoint',
+        400
+      )
+    );
+  }
+  //2.UPDATE THE USER DETAILS
+  const filterObj = filterReqObject(req.body, 'name', 'email');
+  const updatedUser = await User.findByIdAndUpdate(req.user._id, filterObj, {
+    runValidators: true,
+    new: true,
   });
 });

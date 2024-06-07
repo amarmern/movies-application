@@ -8,4 +8,8 @@ router
   .route('/updatePassword')
   .patch(authController.protect, userController.updatePassword);
 
+router
+  .route('/updateMe')
+  .patch(authController.protect, userController.updateMe);
+
 module.exports = router;
