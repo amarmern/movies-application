@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const CustomError = require('../Utils/CustomError');
 const util = require('util');
 const sendEmail = require('../Utils/email');
+const crypto = require('crypto');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.SECRET_STR, {
@@ -152,4 +153,37 @@ exports.forgotPassword = asyncErrorHandler(async (req, res, next) => {
   }
 });
 
-exports.resetPassword = (req, res, next) => {};
+exports.resetPassword = asyncErrorHandler(async (req, res, next) => {
+  //1. IF THE USER EXISTS WITH THE GIVEN TOKEN & PASSWORD HAS NOT EXPIRED
+  const token = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  const user = await User.findOne({
+    passwordResetToken: token,
+    passwordResetTokenExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    const error = new CustomError('Token is invalid or has expired!', 400);
+    next(error);
+  }
+
+  //2. RESETING THR PASSWORD
+  user.password = req.body.password;
+  user.confirmPassword = req.body.confirmPassword;
+  user.passwordResetToken = undefined;
+  user.passwordResetTokenExpire = undefined;
+  user.passwordChangedAt = Date.now();
+
+  user.save();
+
+  //3. LOGIN THE USER AUTOMITACALLY AFTER RESET THE PASSWORD
+  const loginToken = signToken(user._id);
+
+  res.status(200).json({
+    status: 'success',
+    token: loginToken,
+  });
+});
