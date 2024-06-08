@@ -57,6 +57,13 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+// for getting only active all users
+userSchema.pre(/^find/, function (next) {
+  //this keyword in the function will point to current query
+  this.find({ active: { $ne: false } });
+  next();
+});
+
 userSchema.methods.comparePasswordInDb = async function (pswd, pswdDB) {
   return await bcryptjs.compare(pswd, pswdDB);
 };
