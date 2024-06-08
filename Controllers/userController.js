@@ -64,8 +64,24 @@ exports.updateMe = asyncErrorHandler(async (req, res, next) => {
   }
   //2.UPDATE THE USER DETAILS
   const filterObj = filterReqObject(req.body, 'name', 'email');
-  const updatedUser = await User.findByIdAndUpdate(req.user._id, filterObj, {
+  const updatedUser = await User.findByIdAndUpdate(req.user.id, filterObj, {
     runValidators: true,
     new: true,
+  });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user: updatedUser,
+    },
+  });
+});
+
+exports.deleteMe = asyncErrorHandler(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+
+  res.status(204).json({
+    status: 'success',
+    data: null,
   });
 });
