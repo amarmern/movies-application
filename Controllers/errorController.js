@@ -52,6 +52,7 @@ const prodErrors = (res, error) => {
 };
 
 module.exports = (error, req, res, next) => {
+  // Global Error Handling middle ware in express js
   error.statusCode = error.statusCode || 500;
   error.status = error.status || 'error';
 

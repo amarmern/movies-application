@@ -83,7 +83,12 @@ movieSchema.virtual('durationInHours').get(function () {
 });
 
 movieSchema.pre('save', function (next) {
-  console.log(this);
+  //console.log(this);
+  this.CreatedBy = 'Amrendra Kumar';
+  next();
+});
+
+movieSchema.post('save', function (doc, next) {
   next();
 });
 

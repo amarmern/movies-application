@@ -165,7 +165,7 @@ exports.getMovieStats = asyncErrorHandler(async (req, res, next) => {
       },
     },
     {
-      $sort: {},
+      $sort: { minPrice: 1 },
     },
   ]);
   res.status(200).json({
